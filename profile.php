@@ -1,32 +1,39 @@
 <?php
-	class User
+
+	class Profile
 	{
 		// state variables
 		private $id;
-		private $email;
-		private $password;
-		private $salt;
+		private $userId;
+		private $firstName;
+		private $lastName;
+		private $birthday;
+		private $specialNeeds;
 	
 		/* constructor for a User object
 		* input: (integer) new Id
-		* input: (string) new email
-		* input: (string) new password
-		* input: (string) new salt
+		* input: (integer) userId
+		* input: (string) new first name
+		* input: (string) new last name
+		* input: (string) new birthday
+		* input: (boolean) new special needs
 		* throws: when invalid input detected */
-		public function __construct($newId, $newEmail, $newPassword, $newSalt)
+		public function __construct($newId, $newUserId, $newFirstName, $newLastName, $newBirthday, $newSpecialNeeds)
 		{
 			try
 			{
 				// use the mutator methods since they have all input sanitization
 				$this->setId($newId);
-				$this->setEmail($newEmail);
-				$this->setPassword($newPassword);
-				$this->setSalt($newSalt);
+				$this->setUserId($newUserId);
+				$this->setFirstName($newFirstName);
+				$this->setLastName($newLastName);
+				$this->setBirthday($newBirthday);
+				$this->setSpecialNeeds($newSpecialNeeds);
 			}
 			catch(Exception $exception)
 			{
 				// rethrow the exception to the caller
-				throw(new Exception("Unable to build user", 0, $exception));
+				throw(new Exception("Unable to build profile", 0, $exception));
 			}
 		}
 		
@@ -36,19 +43,29 @@
 			return($this->id);
 		}
 		
-		public function getEmail()
+		public function getUserId()
 		{
-			return($this->email);
+			return($this->userId);
 		}
 		
-		public function getPassword()
+		public function getFirstName()
 		{
-			return($this->password);
+			return($this->firstName);
 		}
 		
-		public function getSalt()
+		public function getLastName()
 		{
-			return($this->salt);
+			return($this->lastName);
+		}
+		
+		public function getBirthday()
+		{
+			return($this->birthday);
+		}
+		
+		public function getSpecialNeeds()
+		{
+			return($this->specialNeeds);
 		}
 		
 		// mutator functions
@@ -77,69 +94,109 @@
 			$this->id = $newId;
 		}
 		
-		/* for email
-		* input: (string) new email
+		/* for user id
+		* input: (integer) new user id
 		* output: n/a
-		* throws: invalid email */
-		public function setEmail($newEmail)
+		* throws: invalid input detected */
+		public function setUserId($newUserId)
 		{
-			// trim the email
-			$newEmail = trim($newEmail);
-			
-			// require an @
-			if(strpos($newEmail, "@") === false)
+			if(is_numeric($newUserId) === false)
 			{
-				throw(new Exception("Invalid email detected: $newEmail"));
+				throw(new Exception("Invalid user id detected: $newUserId"));
 			}
 			
-			// sanitized; assign the value
-			$this->email = $newEmail;
+			// convert the id to an integer
+			$newUserId = intval($newUserId);
+			
+			// throw out negative ids, which is our placeholder
+			if($newUserId < 0)
+			{
+				throw(new Exception("Invalid user id detected: $newUserId"));
+			}
+			
+			// sanitized; assign value
+			$this->userId = $newUserId;
 		}
 		
-		/* for password
-		* input: (string) new password
+		/* for first name
+		* input: (string) new first name
 		* output: n/a
-		* throws: invalid email */
-		public function setPassword($newPassword)
+		* throws: invalid first name */
+		public function setFirstName($newFirstName)
 		{
-			// trim the password
-			$newPassword = trim($newPassword);
+			// trim the name
+			$newFirstName = trim($newFirstName);
 			
-			// convert A-F to a-f
-			$newPassword = strtolower($newPassword);
-			
-			// enforce 128 hexadecimal bytes
-			$regexp = "/^[\da-f]{128}$/";
-			if(preg_match($regexp, $newPassword) !== 1)
+			// require characters only
+			$regexp = "/^[A-Za-z]*$/";
+			if(preg_match($regexp, $newFirstName) === false)
 			{
-				throw(new Exception("Invalid password detected: $newPassword"));
+				throw(new Exception("Invalid name detected: $newFirstName"));
 			}
 			
 			// sanitized; assign the value
-			$this->password = $newPassword;
+			$this->firstName = $newFirstName;
 		}
 		
-		/* for salt
-		* input: (string) salt
+		/* for last name
+		* input: (string) new last name
 		* output: n/a
-		* throws: if invalid salt */ 
-		public function setSalt($newSalt)
+		* throws: invalid first name */
+		public function setLastName($newLastName)
 		{
-			// trim the salt
-			$newSalt = trim($newSalt);
+			// trim the name
+			$newLastName = trim($newLastName);
 			
-			// convert A-F to a-f
-			$newSalt = strtolower($newSalt);
-			
-			// enforce 64 hexadecimal bytes
-			$regexp = "/^[\da-f]{64}$/";
-			if(preg_match($regexp, $newSalt) !== 1)
+			// require characters only
+			$regexp = "/^[A-Za-z]*$/";
+			if(preg_match($regexp, $newLastName) === false)
 			{
-				throw(new Exception("Invalid password detected: $newSalt"));
+				throw(new Exception("Invalid name detected: $newLastName"));
 			}
 			
 			// sanitized; assign the value
-			$this->salt = $newSalt;
+			$this->lastName = $newLastName;
+		}
+		
+		/* for birthday
+		* input: (string) new birthday
+		* output: n/a
+		* throws: invalid birthday */
+		public function setBirthday($newBirthday)
+		{	
+			// require the right format
+			$regexp = "/^[\d]{4}\-[\d]{2}\-[\d]{2}$/";
+			if(preg_match($regexp, $newBirthday) === 0)
+			{
+				throw(new Exception("Invalid date: $newBirthday. Please use yyyy-mm-dd"));
+			}
+			
+			// sanitized; assign the value
+			$this->birthday = $newBirthday;
+		}
+		
+		/* for special needs
+		* input: (boolean)
+		* output: n/a
+		* throws: if invalid input */ 
+		public function setSpecialNeeds($newSpecialNeeds)
+		{
+			// check if boolean
+			if(is_bool($newSpecialNeeds) === 0)
+			{
+				throw(new Exception("Not a boolean: $newSpecialNeeds"));
+			}
+			if($newSpecialNeeds)
+			{
+				$newSpecialNeeds = 1;
+			}
+			
+			if(!$newSpecialNeeds)
+			{
+				$newSpecialNeeds = 0;
+			}
+			// sanitized; assign the value
+			$this->specialNeeds = $newSpecialNeeds;
 		}
 		
 		// mySQL mutator methods
@@ -163,7 +220,7 @@
 			}
 			
 			// a create a query template
-			$query = "INSERT INTO user(email, password, salt) VALUES(?, ?, ?)";
+			$query = "INSERT INTO profile (userId, firstName, lastName, birthday, specialNeeds) VALUES(?, ?, ?, ?, ?)";
 			
 			// prepare the query statement
 			$statement = $mysqli->prepare($query);
@@ -173,7 +230,7 @@
 			}
 			
 			// bind parameters to the query template
-			$wasClean = $statement->bind_param("sss", $this->email, $this->password, $this->salt);
+			$wasClean = $statement->bind_param("isssi", $this->userId, $this->firstName, $this->lastName, $this->birthday, $this->specialNeeds);
 			if($wasClean === false)
 			{
 				throw(new Exception("Unable to bind paramenters."));
@@ -189,7 +246,7 @@
 			
 			// trash the statement and create another
 			$statement = null;
-			$query = "SELECT id FROM user WHERE email = ?";
+			$query = "SELECT id FROM profile WHERE userId = ?";
 			$statement = $mysqli->prepare($query);
 			if($statement === false)
 			{
@@ -197,7 +254,7 @@
 			}
 			
 			// bind the query
-			$wasClean = $statement->bind_param("s", $this->email);
+			$wasClean = $statement->bind_param("i", $this->userId);
 			if($wasClean === false)
 			{
 				throw(new Exception("Unable to bind paramenters."));
@@ -251,7 +308,7 @@
 			}
 			
 			// create the query template
-			$query = "DELETE FROM user WHERE id = ?";
+			$query = "DELETE FROM profile WHERE id = ?";
 			
 			// prepare the query statement
 			$statement = $mysqli->prepare($query);
@@ -296,7 +353,7 @@
 			}
 			
 			// create the query template
-			$query = "UPDATE user SET email = ?, password = ?, salt = ? WHERE id = ?";
+			$query = "UPDATE profile SET firstName = ?, lastName = ?, birthday = ?, specialNeeds = ? WHERE id = ?";
 			
 			// prepare the query statement
 			$statement = $mysqli->prepare($query);
@@ -306,7 +363,7 @@
 			}
 			
 			// bind parameters to the query template
-			$wasClean = $statement->bind_param("sssi", $this->email, $this->password, $this->salt, $this->id);
+			$wasClean = $statement->bind_param("sssii", $this->firstName, $this->lastName, $this->birthday, $this->specialNeeds, $this->id);
 			if($wasClean === false)
 			{
 				throw(new Exception("Unable to bind paramenters."));
@@ -327,7 +384,7 @@
 		 * input: (pointer) to mysql
 		 * input: (string) email to search by
 		 * output: (object) user */
-		public static function getUserByEmail(&$mysqli, $email)
+		public static function getProfileByUserId(&$mysqli, $userId)
 		{
 			// check for a good mySQL pointer
 			if(is_object($mysqli) === false || get_class($mysqli) !== "mysqli")
@@ -336,7 +393,7 @@
 			}
 			
 			// create the query template
-			$query = "SELECT id, email, password, salt FROM user WHERE email = ?";
+			$query = "SELECT id, userId, firstName, lastName, birthday, specialNeeds FROM profile WHERE userId = ?";
 			
 			// prepare the query statement
 			$statement = $mysqli->prepare($query);
@@ -346,7 +403,7 @@
 			}
 			
 			// bind parameters to the query template
-			$wasClean = $statement->bind_param("s", $email);
+			$wasClean = $statement->bind_param("i", $userId);
 			if($wasClean === false)
 			{
 				throw(new Exception("Unable to bind paramenters."));
@@ -362,22 +419,23 @@
 			$result = $statement->get_result();
 			if($result === false || $result->num_rows !== 1)
 			{
-				throw(new Exception("Unable to determine user: email not found."));
+				throw(new Exception("Unable to determine user: id not found."));
 			}
 			
 			// get the row and set the id
 			$row = $result->fetch_assoc();
-			$user = new User($row["id"], $row["email"], $row["password"], $row["salt"]);
-			return($user);
+			$profile = new Profile($row["id"], $row["userId"], $row["firstName"], $row["lastName"], $row["birthday"], $row["specialNeeds"]);
 			
 			$statement->close();
+			
+			return($profile);
 		}
 		
 		/* static method to get user by id
 		 * input: (pointer) to mysql
 		 * input: (string) id to search by
 		 * output: (object) user */
-		public static function getUserById(&$mysqli, $id)
+		public static function getProfileById(&$mysqli, $id)
 		{
 			// check for a good mySQL pointer
 			if(is_object($mysqli) === false || get_class($mysqli) !== "mysqli")
@@ -386,7 +444,7 @@
 			}
 			
 			// create the query template
-			$query = "SELECT id, email, password, salt FROM user WHERE id = ?";
+			$query = "SELECT id, userId, firstName, lastName, birthday, specialNeeds FROM profile WHERE id = ?";
 			
 			// prepare the query statement
 			$statement = $mysqli->prepare($query);
@@ -417,10 +475,11 @@
 			
 			// get the row and set the id
 			$row = $result->fetch_assoc();
-			$user = new User($row["id"], $row["email"], $row["password"], $row["salt"]);
-			return($user);
+			$profile = new Profile($row["id"], $row["userId"], $row["firstName"], $row["lastName"], $row["birthday"], $row["specialNeeds"]);
 			
 			$statement->close();
+			
+			return($profile);
 		}
 	}
 ?>

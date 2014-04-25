@@ -76,28 +76,11 @@
 			$user->insert($this->mysqli);
 			
 			//select the user from mySQL and assert it was inserted properly
-			$query = "SELECT id, email, password, salt FROM user WHERE email = ?";
-			$statement = $this->mysqli->prepare($query);
-			$this->assertNotEqual($statement, false);
-			
-			$wasClean = $statement->bind_param("s", $this->email);
-			$this->assertNotEqual($wasClean, false);
-			
-			$executed = $statement->execute();
-			$this->assertNotEqual($executed, false);
-			
-			$result = $statement->get_result();
-			$this->assertNotEqual($result, false);
-			$this->assertIdentical($result->num_rows, 1);
-			
-			// examine the result & assert we got what we want
-			$row = $result->fetch_assoc();
-			$this->sqlUser = new User($row["id"], $row["email"], $row["password"], $row["salt"]);
+			$this->sqlUser = User::getUserByEmail($this->mysqli, $this->email);
 			$this->assertIdentical($this->sqlUser->getEmail(), $this->email);
 			$this->assertIdentical($this->sqlUser->getPassword(), $this->password);
 			$this->assertIdentical($this->sqlUser->getSalt(), $this->salt);
 			$this->assertTrue($this->sqlUser->getId() > 0);
-			$statement->close();
 		}
 		
 		public function testValidUpdateValidUser()
@@ -111,30 +94,13 @@
 			$user->update($this->mysqli);
 			
 			//select the user from mySQL and assert it was inserted properly
-			$query = "SELECT id, email, password, salt FROM user WHERE email = ?";
-			$statement = $this->mysqli->prepare($query);
-			$this->assertNotEqual($statement, false);
-			
-			$wasClean = $statement->bind_param("s", $newEmail);
-			$this->assertNotEqual($wasClean, false);
-			
-			$executed = $statement->execute();
-			$this->assertNotEqual($executed, false);
-			
-			$result = $statement->get_result();
-			$this->assertNotEqual($result, false);
-			$this->assertIdentical($result->num_rows, 1);
-			
-			// examine the result & assert we got what we want
-			$row = $result->fetch_assoc();
-			$this->sqlUser = new User($row["id"], $row["email"], $row["password"], $row["salt"]);
+			$this->sqlUser = User::getUserByEmail($this->mysqli, $newEmail);
 			
 			// verify the email changed
 			$this->assertIdentical($this->sqlUser->getEmail(), $newEmail);
 			$this->assertIdentical($this->sqlUser->getPassword(), $this->password);
 			$this->assertIdentical($this->sqlUser->getSalt(), $this->salt);
 			$this->assertTrue($this->sqlUser->getId() > 0);
-			$statement->close();
 		}
 		
 		// teardown
