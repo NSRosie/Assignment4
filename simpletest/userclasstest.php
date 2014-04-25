@@ -33,6 +33,42 @@
 			}
 		}
 		
+		public function testGetByEmail()
+		{
+			
+			$user = new User (-1, $this->email, $this->password, $this->salt);			
+			$user->insert($this->mysqli);
+			$this->sqlUser = User::getUserByEmail($this->mysqli, $this->email);
+			$this->assertIdentical($user, $this->sqlUser);
+		}
+		
+		public function testGetByEmailInvalid()
+		{
+			
+			$this->sqlUser = new User (-1, $this->email, $this->password, $this->salt);			
+			$this->sqlUser->insert($this->mysqli);
+			$this->expectException("Exception");
+			@User::getUserByEmail($this->mysqli, "steve@jobs.com");
+		}
+		
+		public function testGetById()
+		{
+			
+			$user = new User (-1, $this->email, $this->password, $this->salt);			
+			$user->insert($this->mysqli);
+			$this->sqlUser = User::getUserById($this->mysqli, $user->getId());
+			$this->assertIdentical($user, $this->sqlUser);
+		}
+		
+		public function testGetByIdInvalid()
+		{
+			
+			$this->sqlUser = new User (-1, $this->email, $this->password, $this->salt);			
+			$this->sqlUser->insert($this->mysqli);
+			$this->expectException("Exception");
+			@User::getUserById($this->mysqli, 1);
+		}
+		
 		public function testCreateValidUser()
 		{
 			// create an insert the user
