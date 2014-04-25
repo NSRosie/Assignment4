@@ -128,7 +128,7 @@
 			$newFirstName = trim($newFirstName);
 			
 			// require characters only
-			$regexp = "/^[A-Za-z]*$/";
+			$regexp = "/^[A-Za-z\-\']*$/";
 			if(preg_match($regexp, $newFirstName) === false)
 			{
 				throw(new Exception("Invalid name detected: $newFirstName"));
@@ -148,7 +148,7 @@
 			$newLastName = trim($newLastName);
 			
 			// require characters only
-			$regexp = "/^[A-Za-z]*$/";
+			$regexp = "/^[A-Za-z\-\']*$/";
 			if(preg_match($regexp, $newLastName) === false)
 			{
 				throw(new Exception("Invalid name detected: $newLastName"));
